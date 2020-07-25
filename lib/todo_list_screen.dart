@@ -16,18 +16,11 @@ class _TodoListScreenState extends State<TodoListScreen> {
     await todoProvider.open("todo.db");
   }
 
-  _addTodo() async {
-    final todo = await showDialog<Todo>(
-        context: context,
-        builder: (BuildContext context) {
-          return NewTodoDialog();
-        });
-    if (todo != null) {
-      await todoProvider.insert(todo);
-      setState(() {
-        todos.add(todo);
-      });
-    }
+  _addTodo(Todo todo) async {
+    await todoProvider.insert(todo);
+    setState(() {
+      todos.add(todo);
+    });
   }
 
   _toggleTodo(Todo todo, bool isChecked) async {
@@ -75,7 +68,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.today,semanticLabel: "Today"),
+              icon: Icon(Icons.today, semanticLabel: "Today"),
               onPressed: () => {},
             ),
             SizedBox(),
@@ -90,7 +83,16 @@ class _TodoListScreenState extends State<TodoListScreen> {
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.add),
         tooltip: 'Add to-do',
-        onPressed: _addTodo,
+        onPressed: () async {
+          final todo = await showDialog<Todo>(
+              context: context,
+              builder: (BuildContext context) {
+                return NewTodoDialog();
+              });
+          if (todo != null) {
+            _addTodo(todo);
+          }
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
